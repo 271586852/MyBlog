@@ -1,0 +1,105 @@
+html {
+  font-family: 'Satoshi', sans-serif;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+.animate {
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.animate.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion) {
+  .animate {
+    opacity: 0;
+    transform: translateY(5px);
+    transition:
+      opacity 0.1s ease,
+      transform 0.1s ease;
+  }
+}
+
+/* Scroll bar */
+:root {
+  --scrollbar-width: 6px;
+  --scrollbar-bg: #e0e0e0;
+  --scrollbar-thumb-bg: #c0c0c0;
+}
+html.dark {
+  --scrollbar-bg: #2e2e2e;
+  --scrollbar-thumb-bg: #4e4e4e;
+}
+body::-webkit-scrollbar {
+  height: 0;
+}
+::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+  background: #0000;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-bg);
+  border-radius: 999px;
+  border: 2px solid var(--scrollbar-thumb-bg);
+  opacity: 0.5;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Shiki transformer */
+.astro-code:has(code) {
+  position: relative;
+}
+.astro-code:has(div.title) pre {
+  padding-top: 2.25rem;
+}
+.astro-code button.copy {
+  & .success::before {
+    content: 'Copied!';
+    position: absolute;
+    right: 100%;
+    top: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.75rem;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+    border-radius: 0.25rem;
+    color: hsl(var(--muted-foreground));
+    background-color: hsl(var(--primary-foreground));
+    border: 1px solid hsl(var(--border));
+  }
+  &.copied {
+    & .success {
+      display: block;
+    }
+
+    & .ready {
+      display: none;
+    }
+  }
+}
+.astro-code:hover {
+  button.copy {
+    opacity: 1;
+  }
+  .language {
+    opacity: 0;
+  }
+}
