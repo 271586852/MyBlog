@@ -10,9 +10,21 @@ coverImage: { src: './thumbnail.jpg', color: '#64574D' }
 language: '中文'
 ---
 
-## 站点配置
+## 前言
 
-[astro-theme-pure](https://github.com/cworld1/astro-theme-pure)
+项目中需要用到UBT和UHT工具进行UE的工程编译，有必要对这两个工具作解构，故此写下本文。
+
+要探究UBT与UHT的运行流程，从UBT工程调试着手，打开UE源码，将UBT工程设为启动项，设置命令行参数参考命令
+`newUBTTest Win64 Development -Project="D:\dev\UBTTest\newUBTTest\newUBTTest.uproject" -Modules=Engine -WaitMutex -FromMsBuild`
+
+> [!NOTE]
+>
+> 此处`newUBTTest.uproject`为使用UE编辑器创建的模板工程。
+
+## 入口
+
+开始调试，入口函数`UnrealBuildTool.cs::Main`,进入入口函数后，进行了多个任务的创建
+
 
 客制化本主题需要调整较多的源代码。
 
