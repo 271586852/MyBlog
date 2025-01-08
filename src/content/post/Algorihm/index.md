@@ -37,6 +37,11 @@ void backtracking(参数) {
 ```
 
 
+> [!NOTE]
+>
+> for循环可以理解是横向遍历，backtracking（递归）就是纵向遍历。
+
+
 
 分层分阶
 
