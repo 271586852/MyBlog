@@ -17,53 +17,21 @@ language: '中文'
 5. 作用域
 6. 闭包
 7. 原型链
-8. 事件处理/委托
+8. 事件对象/事件处理/委托
 9. 错误处理/异常处理
-10. 事件队列
-11. JSON
-12. Ajax/Fetch
-13. 正则表达式
+10. 内存管理
+    - 内存生命周期（分配、使用、释放）
+    - 内存管理机制（引用计数、标记清楚、分代回收、增量回收、并行回收）
+    - 内存泄漏（意外的全局变量、未清理的定时器或回调函数、闭包、未清理的DOM引用）
+11. 事件队列
+12. JSON
+13. Ajax/Fetch
+14. 正则表达式
 
 ### 易错
 1. == 和 ===
 
-在 JavaScript 中，`==` 和 `===` 是两种不同的比较运算符，主要区别在于**类型转换**。
-
 ---
-
-### 1. `==`（宽松相等）
-- **会进行类型转换**：如果两边的数据类型不同，`==` 会先将它们转换为相同类型，再比较值。
-- **比较规则**：
-  - 如果类型相同，直接比较值。
-  - 如果类型不同，尝试将值转换为相同类型（如字符串转数字、布尔值转数字等），再比较。
-
-
-```javascript
-console.log(5 == "5"); // true，字符串 "5" 被转换为数字 5
-console.log(true == 1); // true，true 被转换为数字 1
-console.log(null == undefined); // true，null 和 undefined 在宽松相等下被视为相等
-console.log(0 == false); // true，false 被转换为数字 0
-```
-
----
-
-### 2. `===`（严格相等）
-- **不会进行类型转换**：如果两边的数据类型不同，直接返回 `false`。
-- **比较规则**：
-  - 类型不同，直接返回 `false`。
-  - 类型相同，再比较值。
-
-
-```javascript
-console.log(5 === "5"); // false，类型不同
-console.log(true === 1); // false，类型不同
-console.log(null === undefined); // false，类型不同
-console.log(0 === false); // false，类型不同
-console.log(5 === 5); // true，类型和值都相同
-```
-
----
-
 
 | 特性         | `==`（宽松相等）               | `===`（严格相等）               |
 |--------------|-------------------------------|--------------------------------|
@@ -73,33 +41,175 @@ console.log(5 === 5); // true，类型和值都相同
 
 ---
 
-### 使用建议
+使用建议
 - **优先使用 `===`**：避免因类型转换导致的意外行为，代码更安全、可读性更高。
 - **避免使用 `==`**：除非明确需要类型转换，否则容易引入难以发现的 bug。
-
-#### 示例：
-```javascript
-const value = "0";
-
-if (value == 0) {
-    console.log("宽松相等：true"); // 会执行，因为 "0" 被转换为 0
-}
-
-if (value === 0) {
-    console.log("严格相等：true"); // 不会执行，因为类型不同
-}
-```
-
----
-
-- `==` 会进行类型转换，可能导致意外结果。
-- `===` 不会进行类型转换，更严格、更安全。
 - 推荐始终使用 `===`，除非有特殊需求。
 
-2. var、let、const区别
+1. var、let、const区别
 
-3. 回调函数、箭头函数
-4. Promise, async, await
+      - **var**：函数作用域，存在提升，可重复声明。
+
+      - **let**：块级作用域，存在暂时性死区，不可重复声明。
+
+      - **const**：块级作用域，存在暂时性死区，不可重复声明，且不能重新赋值（但可修改对象或数组的属性）。
+
+      ```js
+      console.log(x); // 输出 undefined
+      var x = 10;
+      console.log(x); // 输出 10
+      ```
+
+      相当于如下代码：
+
+      ```js
+      var x; // 声明被提升到顶部，初始化为 undefined
+      console.log(x); // 输出 undefined
+      x = 10; // 赋值
+      console.log(x); // 输出 10
+      ```
+
+2. 匿名函数、箭头函数、回调函数
+3. Promise, async, await
+4. **this**指向问题
+    JavaScript 中的 `this` 是一个特殊关键字，指向**调用函数的上下文对象**，即“谁调用了当前函数”，具体取决于函数被调用的方式、环境和场景。
+
+    `this` 的值并不固定，会随调用方式不同而发生变化。
+
+    ---
+
+    ### 一、`this`的使用场景及指向规则：
+
+    **1. 普通函数调用：**
+    - 严格模式下：`this` 为 `undefined`。
+    - 非严格模式下：`this` 指向全局对象 (`window` 或 `global`)。
+
+    ```javascript
+    function test(){
+      console.log(this);
+    }
+    test(); // window 或 global (非严格模式)
+    ```
+
+    ---
+
+    **2. 对象方法调用：**
+    - 指向调用该方法的**对象本身**。
+
+    ```javascript
+    const obj = {
+      name: "Alice",
+      sayName: function(){
+        console.log(this.name);
+      }
+    };
+
+    obj.sayName(); // Alice，this 指向 obj
+    ```
+
+    ---
+
+    **3. 构造函数调用：**
+    - 指向新创建的**实例对象**。
+
+    ```javascript
+    function Person(name){
+      this.name = name; // 此时的this指向新创建的实例
+    }
+
+    const p = new Person("Bob");
+    console.log(p.name); // Bob
+    ```
+
+    ---
+
+    **4. 箭头函数中的`this`：**
+    - 箭头函数**没有自己的`this`**，其 `this` 值由**外层作用域**决定。
+
+    ```javascript
+    const obj = {
+      name: 'Alice',
+      normalFunc: function() {
+        console.log(this.name); // Alice
+
+        const arrowFunc = () => {
+          console.log(this.name); // Alice，继承了normalFunc的this
+        }
+
+        arrowFunc();
+      }
+    }
+
+    obj.normalFunc();
+    ```
+
+    ---
+
+    **5. 事件处理函数中的`this`：**
+    - 指向触发事件的 DOM 元素：
+
+    ```javascript
+    const btn = document.querySelector("button");
+
+    btn.addEventListener("click", function(){
+      console.log(this); // 指向 btn
+    });
+    ```
+
+    **注意**：若改用箭头函数，此时`this`指向外层作用域：
+
+    ```javascript
+    btn.addEventListener("click", () => {
+      console.log(this); // 不再是按钮，通常是 window
+    });
+    ```
+
+    ---
+
+    **6. `call`、`apply`、`bind` 改变`this`的指向：**
+
+    - 可以手动指定函数调用时的`this`：
+
+    ```javascript
+    function greet(){
+      console.log(this.name);
+    }
+
+    const obj = { name: "Charlie" };
+
+    greet.call(obj); // Charlie
+    ```
+
+    ---
+
+    ### 二、`this` 的指向总结表：
+
+    | 调用方式                 | this指向对象                  |
+    |-------------------------|------------------------------|
+    | 普通函数调用              | window/global 或 undefined(严格模式) |
+    | 对象的方法调用            | 调用方法的对象（obj）           |
+    | 构造函数调用 (`new`)      | 新创建的实例对象               |
+    | 箭头函数                 | 外层作用域的 this              |
+    | DOM 事件处理函数（非箭头函数） | 触发事件的元素                 |
+    | `call`、`apply`、`bind` | 显式指定的对象                 |
+
+    ---
+
+    ### 三、如何确定 `this` 到底是谁？
+
+    可以简单用以下原则判断：
+
+    - 看函数**如何被调用**（而不是在哪里定义）。
+    - 箭头函数时，直接看外层的`this`是谁。
+    - `call`、`apply`、`bind` 强制指定的对象优先级最高。
+
+    理解以上几点，基本就能准确掌握 JavaScript 中的 `this` 含义与指向规则。
+
+5. call、apply、bind区别
+
+### 常考CSS
+1. 水平垂直居中
+2. 
 
 ## STL
 
