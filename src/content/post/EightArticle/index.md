@@ -153,6 +153,99 @@ language: '中文'
       - **宏任务（setTimeout回调）**：是“普通队列”，等微任务执行完才轮到它。
 
 10. 事件对象/事件处理/委托
+
+
+    **1. 事件对象（Event Object）**
+    **事件对象**是浏览器在触发事件时自动创建的一个对象，它包含了与该事件相关的所有信息，比如事件类型、触发元素、鼠标坐标、按键值等。
+
+    **🌟 事件对象的获取**
+    在 `addEventListener` 事件处理函数中，浏览器会自动传递一个**事件对象**（通常命名为 `e` 或 `event`）：
+    ```js
+    document.addEventListener("click", function (e) {
+      console.log(e); // 输出事件对象
+    });
+    ```
+    📌 **常用属性**：
+    | 属性 | 说明 | 示例值 |
+    |------|------|--------|
+    | `e.type` | 事件类型 | `"click"` |
+    | `e.target` | 触发事件的元素 | `<button>` |
+    | `e.clientX, e.clientY` | 鼠标点击坐标 | `150, 200` |
+    | `e.key` | 按下的键盘按键 | `"Enter"` |
+    | `e.ctrlKey` | 是否按住 Ctrl 键 | `true/false` |
+
+    ---
+
+     **2. 事件处理（Event Handling）**
+    **事件处理**指的是**监听事件**并在事件发生时执行**特定的回调函数**。
+
+     **🌟 如何添加事件处理**
+    方法 1️⃣：使用 `addEventListener`（推荐 ✅）
+    ```js
+    document.getElementById("btn").addEventListener("click", function () {
+      console.log("按钮被点击！");
+    });
+    ```
+
+    方法 2️⃣：使用 `on` 前缀（传统方式 ❌ 不推荐）
+    ```js
+    document.getElementById("btn").onclick = function () {
+      console.log("按钮被点击！");
+    };
+    ```
+    📌 **区别**
+    - `addEventListener` **可以同时绑定多个事件**，而 `onclick` **只能有一个**。
+    - `addEventListener` **支持事件选项（`once`、`passive` 等）**，而 `onclick` 不支持。
+
+    ---
+
+     **3. 事件委托（Event Delegation）**
+    **事件委托**是一种优化事件处理的技术，它利用**事件冒泡**，**把事件监听器绑定在父元素上，而不是每个子元素上**，这样可以提高性能和减少内存占用。
+
+     **🌟 为什么要使用事件委托？**
+    👉 **提高性能**：如果有大量子元素，每个元素都绑定事件会影响性能。  
+    👉 **适用于动态元素**：如果是**动态添加的元素**，事件委托可以自动生效。
+
+     **🌟 事件委托的实现**
+    ❌ **错误示例（每个子元素单独绑定事件，性能低）**
+    ```js
+    const items = document.querySelectorAll(".item");
+    items.forEach(item => {
+      item.addEventListener("click", () => console.log("子元素被点击"));
+    });
+    ```
+
+    ✅ **正确示例（使用事件委托，绑定到 `ul` 父元素）**
+    ```js
+    document.querySelector("ul").addEventListener("click", function (e) {
+      if (e.target.tagName === "LI") { // 确保是点击了 <li> 子元素
+        console.log("点击了子元素:", e.target.textContent);
+      }
+    });
+    ```
+
+    📌 **如何工作？**
+    1. `ul` 监听 `click` 事件。
+    2. 事件从 `li` 触发，并**冒泡**到 `ul`。
+    3. `ul` 的监听器检查 `e.target` 是否是 `LI`，如果是，则执行操作。
+
+    ✅ **事件委托适用于**
+    - **列表 (`ul`、`table`、`div` 组)**
+    - **动态生成的元素**
+    - **高频交互的 UI**
+
+    ---
+
+     **总结**
+    | 概念 | 说明 | 例子 |
+    |------|------|------|
+    | **事件对象** | 包含事件信息的对象 | `e.target, e.clientX, e.type` |
+    | **事件处理** | 监听并处理事件的回调 | `addEventListener("click", fn)` |
+    | **事件委托** | 把事件绑定到父元素，提高性能 | `ul.addEventListener("click", fn)` |
+  🚀 **事件委托是前端优化的关键技巧，特别是在需要动态更新 DOM 时非常实用！**
+
+  ---
+
 11. 错误处理/异常处理
 12. 内存管理
     - 内存生命周期（分配、使用、释放）
