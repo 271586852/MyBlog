@@ -242,9 +242,9 @@ language: '中文'
     | **事件对象** | 包含事件信息的对象 | `e.target, e.clientX, e.type` |
     | **事件处理** | 监听并处理事件的回调 | `addEventListener("click", fn)` |
     | **事件委托** | 把事件绑定到父元素，提高性能 | `ul.addEventListener("click", fn)` |
-  🚀 **事件委托是前端优化的关键技巧，特别是在需要动态更新 DOM 时非常实用！**
+    🚀 **事件委托是前端优化的关键技巧，特别是在需要动态更新 DOM 时非常实用！**
 
-  ---
+    ---
 
 11. 错误处理/异常处理
 12. 内存管理
@@ -437,6 +437,8 @@ language: '中文'
     理解以上几点，基本就能准确掌握 JavaScript 中的 `this` 含义与指向规则。
 
 6. call、apply、bind区别
+
+7. window、document、navigator定义及关系
 
 ### 常考CSS
 
