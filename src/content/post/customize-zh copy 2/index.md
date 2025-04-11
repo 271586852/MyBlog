@@ -1,7 +1,7 @@
 ---
-title: Jira学习
+title: 个人定制化指南
 publishDate: 2024-07-27 08:00:00
-description: '前端项目Jira学习记录'
+description: 'astro-theme-pure 个人定制化指南'
 tags:
   - Waline
   - Vercel
@@ -10,7 +10,7 @@ coverImage: { src: './thumbnail.jpg', color: '#64574D' }
 language: '中文'
 ---
 
-## 前言
+## 站点配置
 
 [astro-theme-pure](https://github.com/cworld1/astro-theme-pure)
 
@@ -126,29 +126,11 @@ export default defineConfig({
 })
 ```
 
-## 安装
 
-### 安装项目
+1、代理问题
+调用openai出现代理问题。
+![alt text](72017d9a4f3af7956d615e182309c6b.png)
 
-``` bash
-  npx create-react-app my-app --template typescript
-```
- 
-### 配置项目
-使用prettier格式化代码
-使用commitlint规范提交代码
-使用husky进行代码提交前的校验
-使用lint-staged进行代码提交前的校验
+![alt text](image.png)
 
-### 开发
-#### Mock方案
-- 代码侵入
-- 请求拦截
-- 接口管理工具（rap、swagger、moco、yapi）
-- 本地node服务器（json-server）
-
-#### 状态提升
-
-
-#### react和hook
-- 学习自定义hook
+2、连接超时问题
