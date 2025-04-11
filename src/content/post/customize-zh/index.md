@@ -1,6 +1,6 @@
 ---
 title: 个人定制化指南
-publishDate: 2024-07-27 08:00:00
+publishDate: 2024-07-25 08:00:00
 description: 'astro-theme-pure 个人定制化指南'
 tags:
   - Waline
