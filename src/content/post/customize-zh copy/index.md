@@ -1,7 +1,7 @@
 ---
 title: Jira学习
 publishDate: 2024-07-27 08:00:00
-description: 'Jira学习'
+description: '前端项目Jira学习记录'
 tags:
   - Waline
   - Vercel
