@@ -126,11 +126,3 @@ export default defineConfig({
 })
 ```
 
-
-1、代理问题
-调用openai出现代理问题。
-![alt text](72017d9a4f3af7956d615e182309c6b.png)
-
-![alt text](image.png)
-
-2、连接超时问题
