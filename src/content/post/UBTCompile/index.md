@@ -22,118 +22,136 @@ language: '中文'
 > 此处`newUBTTest.uproject`为使用UE编辑器创建的模板工程。
 
 ## 入口
-
 开始调试，入口函数`UnrealBuildTool.cs::Main`,进入入口函数后，进行了多个任务的创建
 
+### 解决方案工程的生成
 
-客制化本主题需要调整较多的源代码。
+我们点击右键UE4工程，选择 **Generate Visual Studio project**，将会生成用于 Visual Studio 调试的工程文件 `MyProject.sln`。这一过程的原理如下：
 
-我们已经尽力将配置项集中在 `src/site.config.ts` 文件中，以方便用户进行修改，并集成了较多常见的社交媒体/工具 icon，如果你想要添加新的 icon，你需要自行修改源代码。
+### Generate Visual Studio Project 的实质
 
-你可以在全局搜索如下关键字来找到需要替换的文本：
+点击右键并选择生成 Visual Studio 文件，实际上是执行了 `UnrealBuildTool.exe` 的带参命令，例如：
 
-- `Lorem ipsum`
-- `astro-theme-pure`
-- `cworld`
+```bash
+"C:/Program Files/Epic Games/UE_4.15/Engine/Binaries/DotNET/UnrealBuildTool.exe" -projectfiles -project="C:/UnrealEngine4Project/GJM_Flying/GJM_Flying.uproject" -game -rocket -progress
+```
 
-接下来我们逐一展开介绍。
+如果你的 UE4 是从其他电脑复制过来的，右键 UE4 工程可能没有生成 Visual Studio 的选项。这种情况下，可以手动运行上述命令生成 `.sln` 工程文件。
 
-### 主配置文件 `src/site.config.ts`
+### 调用 UnrealBuildTool 做了什么？
 
-请根据现有 `src/site.config.ts` 模板修改对应配置。
+UnrealBuildTool (UBT) 扫描了解决方案目录中的模块、插件和源文件，更新项目文件和解决方案，同时生成 Intellisense 数据（如光标悬停时显示类定义和注释）。
 
-一些特殊配置项的说明如下：
+在这个过程中，UBT 会创建两个重要的目录：`.vs` 文件夹和 `Intermediate` 文件夹。
 
-#### Waline 评论系统
+- **`.vs` 文件夹**  
+  存储当前用户在解决方案中的工作配置，例如窗口布局、最后打开的选项卡、调试断点等。这些信息用于在重新打开解决方案时恢复工作状态。
 
-> [!NOTE]
->
-> 对应 `src/site.config.ts` 中的 `siteConfig.walineServerUrl` 配置项。
+- **`Intermediate` 文件夹**  
+  初始化一些空文件夹，并在 `/Build/BuildRules` 文件夹下生成模块扫描地址（`.txt`）、动态库（`.dll`）、调试信息文件（`.pdb`）等。此外，还会在 `ProjectFiles` 文件夹中生成 UE4 和项目的工程配置文件。
 
-主题的评论、阅读统计、点赞等功能均由 [Waline](https://waline.js.org/) 提供。
+### 涉及的文件说明
 
-你可以参照其文档进行配置，推荐使用 [Vercel](https://vercel.com/) + [Supabase](https://supabase.com/) 的组合。
+- **`.sln`**: 解决方案配置文件，管理方案中的多个 `vcxproj` 工程。
+- **`.vcxproj`**: 工程配置文件，管理工程中的细节（如包含的文件、引用的库等）。
+- **`.vcxproj.filters`**: 筛选器文件，保存解决方案中的筛选器信息。
+- **`.vcxproj.user`**: 本地化用户配置文件，允许用户自定义项目的开发环境。
+- **`.suo`**: 解决方案用户选项文件，记录与解决方案关联的用户设置。
+- **`.pdb`**: 程序数据库文件，存储调试信息。
 
-本主题只需要在 `src/site.config.ts` 中的 `siteConfig.walineServerUrl` 提供最终的后端域名即可。
+### 开始调试
 
-#### Footer
+生成工程文件后，可以在 Visual Studio 中编译项目。编译过程的主要步骤如下：
 
-> [!NOTE]
->
-> 对应 `src/site.config.ts` 中的 `socialLinks` 配置项。
+1. **配置信息**  
+   编译器需要知道系统环境（如标准库路径、安装位置等）。这些信息通过编译参数指定，存储在 `.sln` 文件中。
 
-目前支持的社交媒体包括：
+2. **确定依赖关系**  
+   编译器通过 `makefile` 文件确定源码文件的编译顺序和依赖关系。例如：
+   - A 文件依赖于 B 文件时，B 文件必须先编译。
+   - 当 B 文件发生变化时，A 文件会被重新编译。
 
-- `coolapk`
-- `telegram`
-- `github`
-- `bilibili`
-- `twitter`
-- `zhihu`
-- `steam`
-- `netease_music`
+3. **调用批处理文件**  
+   Visual Studio 调用批处理文件（如 `build.bat`）执行编译任务。批处理文件最终调用 UBT 完成构建。
 
-如果你想要添加新的社交媒体，你需要修改如下文件：
+---
 
-- `src/types.ts`：添加新的 `SocialLink.name` 枚举值以及 `SocialMediaIconId` 的 icon 映射关系
-- `public/icons/social.svg`：遵循现有格式，以 symbol 方式添加新的 icon
+## UBT - 引擎构建工具
 
-  推荐在如下网站寻找社交媒体的 icon，以保持一致性：
+### UBT 的主要职责
 
-  - [remixicon](https://remixicon.com/)
-  - [mingcute](https://www.mingcute.com/)
+- 扫描解决方案目录中的模块和插件。
+- 确定需要重新构建的模块。
+- 调用 UHT 解析 C++ 头文件。
+- 从 `.Build.cs` 和 `.Target.cs` 文件生成编译器和链接器选项。
+- 执行特定平台的编译器（如 Visual Studio 或 LLVM）。
 
-### 其他需要替换的文件
+### UBT 的工作流程
 
-- `public/favicon`：网站的 favicon，你可以在 [favicon.io](https://favicon.io/favicon-converter/) 生成 favicon
-- `public/images/social-card.png`：网站的社交卡片
-- `src/assets/`：此目录下包含客户端渲染的头像、赞助二维码等图片，请替换为你自己的图片
+1. **收集信息与参数解析**  
+   UBT 收集模块、插件和源文件信息，并解析命令行参数。
+
+2. **生成 Makefile**  
+   UBT 生成 `makefile` 文件，确定模块的依赖关系。
+
+3. **调用 UHT**  
+   UBT 调用 Unreal Header Tool (UHT) 解析 C++ 头文件，生成反射代码。
+
+---
+
+## UHT - 预编译预处理工具
+
+### UHT 的主要职责
+
+- 初始化日志系统和文件系统。
+- 解析 C++ 头文件，生成反射代码。
+
+### UHT 的工作流程
+
+1. **解析 `.uhtmanifest` 文件**  
+   UHT 读取 `.uhtmanifest` 文件，获取模块编译路径、C++ 路径和预编译头路径。
+
+2. **解析头文件**  
+   UHT 解析头文件中的宏（如 `UENUM()`、`UCLASS()`、`USTRUCT()` 等），生成 `.generated.h` 和 `.gen.cpp` 文件。
+
+3. **生成反射代码**  
+   - `.generated.cpp`: 为每个支持反射的类生成反射信息代码。
+   - `.generated.h`: 为每个支持反射的头文件生成对应的宏代码。
+
+---
+
+## 编译与链接
+
+UHT 生成反射代码后，Visual Studio 调用编译器完成编译和链接：
+
+1. **编译**  
+   将源代码翻译为目标文件（`.obj`）。
+
+2. **链接**  
+   将目标文件与库文件链接，生成可执行程序或动态库。
+
+---
+
+## 总结
+
+- UBT 负责收集信息、解析参数、生成 `makefile`，并调用 UHT。
+- UHT 负责解析头文件，生成反射代码。
+- Visual Studio 完成最终的编译和链接。
+
+通过以上流程，UE4 的工程编译得以完成。
+
+
+## 流程图
+![alt text](UBT.png)
 
 ## 其他页面
 
-### About
+- [编译器的工作过程](http://www.ruanyifeng.com/blog/2014/11/compiler.html)
 
-目前支持的 icon 可在 `src/icons` 目录下找到。
+- [虚幻4反射](https://www.cnblogs.com/ghl_carmack/p/5698438.html)
 
-如果你想要添加新的 Tools 图标，你需要在 `src/icons` 目录下添加新的 icon。
+- [UE4反射宏展开](https://zhuanlan.zhihu.com/p/46836554)
 
-推荐在如下网站寻找新的 icon，以保持一致性：
+- [调用UHT时机](https://zhuanlan.zhihu.com/p/561178256)
 
-- [iconify](https://icon-sets.iconify.design/)
-- [icones](https://icones.js.org/)
-
-## 部署模式
-
-> [!NOTE]
->
-> 对应 `astro.config.ts` 中的 `export default defineConfig` 配置项。
-
-如果你采用 Vercel 部署，你无需修改。
-
-如果你采用 Node.js 本地部署，你需要依照 `astro.config.ts` 中的注释，修改
-
-```ts
-import vercel from '@astrojs/vercel/serverless'
-...
-export default defineConfig({
-  adapter: vercel({
-    webAnalytics: {
-      enabled: true
-    }
-  }),
-  ...
-})
-```
-
-为
-
-```ts
-import node from '@astrojs/node'
-...
-export default defineConfig({
-  adapter: node({
-    mode: 'standalone'
-  }),
-  ...
-})
-```
+- [探讨UE4中的UBT和UHT](https://www.cnblogs.com/shadow-lr/p/UBT-UHT-InUE4.html#uht)
