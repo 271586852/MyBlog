@@ -36,357 +36,492 @@ void backtracking(参数) {
 }
 ```
 
+#### 设计链表
+
+```javascript
+var MyLinkedList = function() {
+    this.size = 0;
+    this.head = new ListNode(0);
+};
+
+/** 
+ * @param {number} index
+ * @return {number}
+ */
+MyLinkedList.prototype.get = function(index) {
+    if(index < 0 || index >= this.size){
+        return -1
+    }
+    let current = this.head.next;
+    for(let i = 0; i < index;i++){
+        current = current.next;
+    }
+    return current.val;
+};
+
+/** 
+ * @param {number} val
+ * @return {void}
+ */
+MyLinkedList.prototype.addAtHead = function(val) {
+    let addHead = new ListNode(val);
+    
+    addHead.next = this.head.next;
+    this.head.next = addHead;
+    this.size ++;
+};
+
+/** 
+ * @param {number} val
+ * @return {void}
+ */
+MyLinkedList.prototype.addAtTail = function(val) {
+    let addTail = new ListNode(val);
+    let current = this.head;
+    while(current.next != null){
+        current = current.next;
+    }
+    current.next = addTail;
+    this.size ++; 
+};
+
+/** 
+ * @param {number} index 
+ * @param {number} val
+ * @return {void}
+ */
+MyLinkedList.prototype.addAtIndex = function(index, val) {
+    if(index < 0 || index > this.size){
+        return ;
+    }
+    let newListNode = new ListNode(val);
+    let current = this.head;
+    for(let i = 0; i < index; i++){
+        current = current.next;
+    }
+    newListNode.next = current.next;
+    current.next = newListNode;
+    this.size++;
+};
+
+/** 
+ * @param {number} index
+ * @return {void}
+ */
+MyLinkedList.prototype.deleteAtIndex = function(index) {
+    if (index < 0 || index >= this.size) return;
+    let prev = this.head;
+    while (index--) prev = prev.next;
+    prev.next = prev.next.next;
+    this.size--;
+};
+
+/** 
+ * Your MyLinkedList object will be instantiated and called as such:
+ * var obj = new MyLinkedList()
+ * var param_1 = obj.get(index)
+ * obj.addAtHead(val)
+ * obj.addAtTail(val)
+ * obj.addAtIndex(index,val)
+ * obj.deleteAtIndex(index)
+ */
+```
+
+
+> [!note] 注意
+> 1. 构造函数的初始化写法
+> 2. head是头节点还是哑节点
+> 3. 注意检测index的边界
+> 4. index >= this.size 还是 index > this.size ？
+
+
+#### 翻转链表
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var reverseList = function(head) {
+    let prev = null;
+    let current = head;
+    while(current!=null){
+        let temp = current.next;
+        current.next = prev;
+        prev = current;
+        current = temp;
+    }
+    return prev;
+};
+```
+
+> [!note] 注意
+> 1. 共用到了三个指针
+> 2. 注意返回值是哪个
+
+
+```javascript
+/**
+ * @param {ListNode} head
+ * @return {ListNode}
+ */
+var swapPairs = function (head) {
+  let ret = new ListNode(0, head), temp = ret;
+  while (temp.next && temp.next.next) {
+    let cur = temp.next.next, pre = temp.next;
+    pre.next = cur.next;
+    cur.next = pre;
+    temp.next = cur;
+    temp = pre;
+  }
+  return ret.next;
+};
+```
+
+> [!note] 注意
+> 1. 为什么初始temp需要是哑节点？
+
+
+#### 删除链表倒数第n个节点
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+
+var lengthList = function(head){
+    let length = 0;
+    while(head != null){
+        head = head.next;
+        length ++;
+    }
+    return length;
+}
+
+/**
+ * @param {ListNode} head
+ * @param {number} n
+ * @return {ListNode}
+ */
+var removeNthFromEnd = function(head, n) {
+    let length = lengthList(head);
+    length = length - n;
+    let dummy = new ListNode();
+    dummy.next = head;
+    let prev = dummy;
+    while(length--){
+        prev = prev.next;
+    }
+    prev.next = prev.next.next;
+    return dummy.next;
+};
+```
 
 > [!NOTE]
->
+> 注意删除的位置下标
+
+#### 链表相交
+
+```javascript
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val) {
+ *     this.val = val;
+ *     this.next = null;
+ * }
+ */
+
+var lengthList = function(head){
+    let length = 0;
+    while(head != null){
+        head = head.next
+        length++;
+    }
+    return length;
+}
+
+/**
+ * @param {ListNode} headA
+ * @param {ListNode} headB
+ * @return {ListNode}
+ */
+var getIntersectionNode = function(headA, headB) {
+    let lengthHeadA = lengthList(headA);
+    let lengthHeadB = lengthList(headB);
+    let dummyA = new ListNode(0,headA);
+    let dummyB = new ListNode(0,headB);
+    let currentA = dummyA;
+    let currentB = dummyB;
+    let bigNumber = 0;
+    if(lengthHeadA >= lengthHeadB){
+        bigNumber = lengthHeadA - lengthHeadB;
+        while(bigNumber--){
+            currentA = currentA.next;
+        }
+    }else if(lengthHeadB > lengthHeadA){
+        bigNumber = lengthHeadB - lengthHeadA;
+        while(bigNumber--){
+            currentB = currentB.next;
+        }
+    }
+
+    while(currentA != null && currentB != null){
+        if(currentA === currentB){
+            return currentA
+        }
+        currentA = currentA.next;
+        currentB = currentB.next;
+    }
+    return null;
+};
+```
+
+> [!NOTE]
+> 思考简单方法 哈希集合法？双指针法？
+
+```javascript
+var getIntersectionNode = function(headA, headB) {
+    const visited = new Set();
+    let temp = headA;
+    while (temp !== null) {
+        visited.add(temp);
+        temp = temp.next;
+    }
+    temp = headB;
+    while (temp !== null) {
+        if (visited.has(temp)) {
+            return temp;
+        }
+        temp = temp.next;
+    }
+    return null;
+};
+```
+
+### 哈希表
+
+#### 有效的字母异味词
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {boolean}
+ */
+var isAnagram = function(s, t) {
+    if(s.length != t.length){
+        return false;
+    }
+    let hashDetect = new Map();
+    for(const a of s){
+        hashDetect.set(hashDetect.set(a, (hashDetect.get(a) || 0) + 1))
+    }
+    for(const b of t){
+        if(!hashDetect.has(b) || hashDetect.get(b) === 0)
+        {return false;}
+
+        hashDetect.set(b, hashDetect.get(b) - 1);
+    }
+    console.log(hashDetect);
+    return true;
+};
+```
+
+> [!NOTE]
+> 注意向表中增加数字的写法
+> 为什么(cacMap.get(char)||0)要带上||，如果不带会是什么值
+
+
+#### 两个数组的交集
+
+```javascript
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @return {number[]}
+ */
+var intersection = function(nums1, nums2) {
+    let hashMap1 = new Map();
+    let hashMap2 = new Map();
+
+    let resultSet = new Set();
+    let result = [];
+    for(const char of nums1){
+        hashMap1.set(char,(hashMap1.get(char)||0)+1);
+    }
+    for(const char of nums2){
+        if(hashMap1.has(char)){
+            resultSet.add(char);
+        }
+    }
+    //数组写法
+    // for(const char of resultSet){
+    //     result.push(char);
+    // }
+    // return result;
+    
+    //集合解构转数组，更方便
+    return [...resultSet]
+};
+```
+
+> [!NOTE]
+> 将集合变为数组的简化写法 [...resultSet]
+
+#### 快乐数
+
+```javascript
+/**
+ * @param {number} n
+ * @return {boolean}
+ */
+var isHappy = function (n) {
+    let newNnumber = n;
+    let oldSet = new Set();
+
+    // 核心计算方法
+    const getSum = (num) => {
+        let sum = 0;
+        while (num) {
+            let digit = num % 10;   
+            let square = digit * digit; 
+            sum += square;
+        
+            num = Math.floor(num / 10); 
+        }
+        return sum;
+    };
+    
+    while (true) {
+        if (newNnumber === 1) {
+            return true
+        }
+        if (oldSet.has(newNnumber)) {
+            return false;
+        }
+        oldSet.add(newNnumber);
+        newNnumber = getSum(newNnumber);
+    }
+};
+```
+
+> [!NOTE]
+> 注意核心算法：将一个正整数上的每个数字相加
+
+#### 两数之和
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var twoSum = function(nums, target) {
+    let map = new Map();
+    let index= 0;
+    let result = [];
+    for(const num of nums){
+        let targetNumber = target - num;
+        if(map.has(targetNumber)){
+            result.push(map.get(targetNumber),index);
+            return result;
+        }
+        map.set(num,index);
+        index++;
+    }
+};
+```
+
+> [!NOTE]
+> 注意不能使用同一个下标，思考改用什么来存储下标
+
+#### 赎金信
+
+```js
+/**
+ * @param {string} ransomNote
+ * @param {string} magazine
+ * @return {boolean}
+ */
+var canConstruct = function(ransomNote, magazine) {
+    if(ransomNote.length > magazine.length){
+        return false;
+    }
+    let map1 = new Map();
+    let map2 = new Map();
+    for(const char of ransomNote){
+        map1.set(char, (map1.get(char)||0)+1)
+    }
+    for(const char of magazine){
+        map2.set(char, (map2.get(char)||0)+1)
+    }
+    for(const char of map1){
+        let hasOrNot = map2.has(char[0]);
+        if(!map2.has(char[0]) ){
+            return false;
+        }
+        let a = (map2.get(char[0])||0);
+        let b = (map1.get(char[0])||0);
+        if(a < b){
+            return false;
+        }
+    }
+    return true;
+};
+```
+
+> [!NOTE]
+> 注意获取map的键值对的方式 char[0] char[1];
+
+#### 四数之和
+
+```js
+/**
+ * @param {number[]} nums1
+ * @param {number[]} nums2
+ * @param {number[]} nums3
+ * @param {number[]} nums4
+ * @return {number}
+ */
+var fourSumCount = function(nums1, nums2, nums3, nums4) {
+    let result = 0;
+    let mapA = new Map();
+    let mapB = new Map();
+    let count = 0;
+    for(let i = 0;i < nums1.length;i++){
+        for(let j = 0; j < nums2.length ; j++){
+            let addNum1 = nums1[i] + nums2[j];
+            mapA.set(addNum1,(mapA.get(addNum1)||0)+1);
+        }
+    }
+    for(let i = 0;i < nums3.length; i++){
+        for(let j = 0; j < nums4.length; j++){
+            let addNum2 =  nums3[i]+nums4[j];
+            let targetNumber = 0 - addNum2;
+           if(mapA.has(targetNumber)){
+                count = count + (mapA.get(targetNumber));
+           }
+        }
+    }
+    return count;
+};
+```
+
+> [!NOTE]
+> 四重循环可以吗？分成两组的目的是什么？
+
+
+> [!NOTE]
 > for循环可以理解是横向遍历，backtracking（递归）就是纵向遍历。
 
-
-
-分层分阶
-
-Markdown 是一种轻量级且易于使用的语法，用于为您的写作设计风格。
-
-### 标题
-
-文章内容较多时，可以用标题分段：
-
-```markdown
-# 标题 1
-
-## 标题 2
-
-## 大标题
-
-### 小标题
-```
-
-标题预览会打乱文章的结构，所以在此不展示。
-
-### 粗斜体
-
-```markdown
-_斜体文本_
-
-**粗体文本**
-
-**_粗斜体文本_**
-```
-
-预览：
-
-_斜体文本_
-
-**粗体文本**
-
-**_粗斜体文本_**
-
-### 链接
-
-```markdown
-文字链接 [链接名称](http://链接网址)
-```
-
-预览：
-
-文字链接 [链接名称](http://链接网址)
-
-### 行内代码
-
-```markdown
-这是一条 `单行代码`
-```
-
-预览：
-
-这是一条 `行内代码`
-
-### 代码块
-
-````markdown
-```js
-// calculate fibonacci
-function fibonacci(n) {
-  if (n <= 1) return 1
-  return fibonacci(n - 1) + fibonacci(n - 2)
-}
-```
-````
-
-预览：
-
-```js
-// calculate fibonacci
-function fibonacci(n) {
-  if (n <= 1) return 1
-  return fibonacci(n - 1) + fibonacci(n - 2)
-}
-```
-
-当前使用 shiki 作为代码高亮插件，支持的语言请参考 [shiki / languages](https://shiki.matsu.io/languages.html)。
-
-### 行内公式
-
-```markdown
-这是一条行内公式 $e^{i\pi} + 1 = 0$
-```
-
-预览：
-
-这是一条行内公式 $e^{i\pi} + 1 = 0$
-
-### 公式块
-
-```markdown
-$$
-\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x) e^{-2\pi i x \xi} \, dx
-$$
-```
-
-预览：
-
-$$
-\hat{f}(\xi) = \int_{-\infty}^{\infty} f(x) e^{-2\pi i x \xi} \, dx
-$$
-
-当前使用 KaTeX 作为数学公式插件，支持的语法请参考 [KaTeX Supported Functions](https://katex.org/docs/supported.html)。
-
-#### 图片
-
-```markdown
-![CWorld](https://cravatar.cn/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200)
-```
-
-预览：
-
-![CWorld](https://cravatar.cn/avatar/1ffe42aa45a6b1444a786b1f32dfa8aa?s=200)
-
-#### 删除线
-
-```markdown
-~~删除线~~
-```
-
-预览：
-
-~~删除线~~
-
-### 列表
-
-普通无序列表
-
-```markdown
-- 1
-- 2
-- 3
-```
-
-预览：
-
-- 1
-- 2
-- 3
-
-普通有序列表
-
-```markdown
-1. GPT-4
-2. Claude Opus
-3. LLaMa
-```
-
-预览：
-
-1. GPT-4
-2. Claude Opus
-3. LLaMa
-
-列表里可以继续嵌套语法
-
-### 引用
-
-```markdown
-> 枪响，雷鸣，剑起。繁花血景。
-```
-
-预览：
-
-> 枪响，雷鸣，剑起。繁花血景。
-
-引用里也可以继续嵌套语法。
-
-### 换行
-
-markdown 分段落是需要空一行的。
-
-```markdown
-如果不空行
-就会在一段
-
-第一段
-
-第二段
-```
-
-预览：
-
-如果不空行
-就会在一段
-
-第一段
-
-第二段
-
-### 分隔符
-
-如果你有写分割线的习惯，可以新起一行输入三个减号`---` 或者星号 `***`。当前后都有段落时，请空出一行：
-
-```markdown
----
-```
-
-预览：
-
----
-
-## 高级技巧
-
-### 行内 HTML 元素
-
-目前只支持部分段内 HTML 元素效果，包括 `<kdb> <b> <i> <em> <sup> <sub> <br>` ，如
-
-#### 键位显示
-
-```markdown
-使用 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd> 重启电脑
-```
-
-预览：
-
-使用 <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd> 重启电脑
-
-#### 粗斜体
-
-```markdown
-<b> Markdown 在此处同样适用，如 _加粗_ </b>
-```
-
-预览：
-
-<b> Markdown 在此处同样适用，如 _加粗_ </b>
-
-### 其他 HTML 写法
-
-#### 折叠块
-
-```markdown
-<details><summary>点击展开</summary>它被隐藏了</details>
-```
-
-预览：
-
-<details><summary>点击展开</summary>它被隐藏了</details>
-
-### 表格
-
-```markdown
-| 表头1 | 表头2 |
-| ----- | ----- |
-| 内容1 | 内容2 |
-```
-
-预览：
-
-| 表头1 | 表头2 |
-| ----- | ----- |
-| 内容1 | 内容2 |
-
-### 注释
-
-```markdown
-在引用的地方使用 [^注释] 来添加注释。
-
-然后在文档的结尾，添加注释的内容（会默认于文章结尾渲染之）。
-
-[^注释]: 这里是注释的内容
-```
-
-预览：
-
-在引用的地方使用 [^注释] 来添加注释。
-
-然后在文档的结尾，添加注释的内容（会默认于文章结尾渲染之）。
-
-[^注释]: 这里是注释的内容
-
-### To-Do 列表
-
-```markdown
-- [ ] 未完成的任务
-- [x] 已完成的任务
-```
-
-预览：
-
-- [ ] 未完成的任务
-- [x] 已完成的任务
-
-### 特别引用块
-
-```markdown
-> [!NOTE]
-> 在浏览内容时，用户也应该知道的有用信息。
-
-> [!TIP]
-> 可以更好或更容易地完成事情的有用建议。
-
-> [!IMPORTANT]
-> 用户需要知道的关键信息。
-
-> [!WARNING]
-> 需要用户立即关注以避免问题的紧急信息。
-
-> [!CAUTION]
-> 就某些行为的风险或负面结果提供建议。
-```
-
-预览：
-
-> [!NOTE]
-> 在浏览内容时，用户也应该知道的有用信息。
-
-> [!TIP]
-> 可以更好或更容易地完成事情的有用建议。
-
-> [!IMPORTANT]
-> 用户需要知道的关键信息。
-
-> [!WARNING]
-> 需要用户立即关注以避免问题的紧急信息。
-
-> [!CAUTION]
-> 就某些行为的风险或负面结果提供建议。
-
-### 符号转义
-
-如果你的描述中需要用到 markdown 的符号，比如 \_ # \* 等，但又不想它被转义，这时候可以在这些符号前加反斜杠，如 `\_` `\#` `\*` 进行避免。
-
-```markdown
-\_不想这里的文本变斜体\_
-
-\*\*不想这里的文本被加粗\*\*
-```
-
-预览：
-
-\_不想这里的文本变斜体\_
-
-\*\*不想这里的文本被加粗\*\*
-
----
-
-## 内嵌 Astro 组件
-
-源代码位于 `src/components` 目录下，一般不用于写作，而是用于页面的客制化。
-
-你可以仿照现有组件的写法，自行添加新的组件。
