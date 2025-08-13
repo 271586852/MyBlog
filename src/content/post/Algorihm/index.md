@@ -484,7 +484,7 @@ var canConstruct = function(ransomNote, magazine) {
 > [!NOTE]
 > 注意获取map的键值对的方式 char[0] char[1];
 
-#### 四数之和
+#### 四数之加Ⅱ
 
 ```js
 /**
@@ -521,7 +521,210 @@ var fourSumCount = function(nums1, nums2, nums3, nums4) {
 > [!NOTE]
 > 四重循环可以吗？分成两组的目的是什么？
 
+#### 三数之和
+
+```js
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+var threeSum = function (nums) {
+    nums.sort((a, b) => a - b);
+    let result = [];
+    let map = new Map();
+    if (nums.length < 3) {
+        return [];
+    }
+    for (let i = 0; i < nums.length - 2; i++) {
+        //if(map.has(nums[i])) continue;
+        //if (i > 0 && nums[i] === nums[i - 1]) continue;
+        let left = i + 1;
+        let right = nums.length - 1;
+        let targetNumber = 0 - nums[i];
+        while (left < right) {
+            if (nums[left] + nums[right] === targetNumber) {
+                let item = [nums[i], nums[left], nums[right]]
+                //console.log(result.includes(item));
+                if (result.includes(item)) {
+                    continue;
+                }
+                result.push(item);
+
+                left++;
+
+                right--;
+                map.set(nums[left], left);
+                //console.log(result);
+            }
+            else if (nums[left] + nums[right] < targetNumber) {
+                left++;
+            }
+            else if (nums[left] + nums[right] > targetNumber) {
+                right--;
+            }
+        }
+        // 去重结果数组，确保结果中没有重复的组合
+        let resultSet = new Set(result.map(JSON.stringify));
+        result = Array.from(resultSet).map(JSON.parse);
+    }
+    return result;
+};
+```
+
+#### 四数之和
+
+```js
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[][]}
+ */
+var fourSum = function (nums, target) {
+    let result = [];
+    if (nums.length < 4) {
+        return []
+    }
+    nums.sort((a,b)=>a-b);
+    console.log(nums);
+    for (let i = 0; i < nums.length - 3; i++){
+        // 去重 i
+        if (i > 0 && nums[i] === nums[i - 1]) continue;
+
+        // 最小 4 数和 > target，后面更大，直接退出
+        if (nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) break;
+        // 最大 4 数和 < target，当前 i 太小，进入下一轮
+        if (nums[i] + nums[nums.length - 3] + nums[nums.length - 2] + nums[nums.length - 1] < target) continue;
+        //if(nums[i] === nums[i+1]) continue;
+        for (let j = i+1; j < nums.length - 2; j++) {
+            //if(nums[j] === nums[j+1]) continue;
+            let left = j + 1;
+            let right = nums.length - 1;
+            let targetNumber = target - (nums[i] + nums[j]);
+            while (left < right) {
+                let sum = nums[left] + nums[right];
+                if (sum === targetNumber) {
+                    result.push([nums[i], nums[j], nums[left], nums[right]].sort((a,b)=>a-b))
+                    console.log(i,j,left,right)
+                    left++;
+                    right--;
+                    
+                }
+                else if (sum < targetNumber) {
+                    left++;
+                }
+                else if (sum > targetNumber) {
+                    right--;
+                }
+            }
+        }
+    }
+    let set = new Set(result.map(JSON.stringify));
+    result = Array.from(set).map(JSON.parse);
+    return result;
+};
+```
+
+
+### 字符串
+
+#### 翻转字符串
+
+```js
+/**
+ * @param {character[]} s
+ * @return {void} Do not return anything, modify s in-place instead.
+ */
+var reverseString = function(s) {
+    for(let i = 0;i < s.length/2;i++){
+        let temp = s[i];
+        s[i] = s[s.length-1 - i];
+        s[s.length-1 - i] = temp;
+    }
+    return s;
+};
+```
 
 > [!NOTE]
-> for循环可以理解是横向遍历，backtracking（递归）就是纵向遍历。
+> 可以直接交换字符串中的字符位置吗
+> 注意双指针中右指针的边界
 
+
+#### 翻转字符串Ⅱ
+
+```js
+/**
+ * @param {string} s
+ * @param {number} k
+ * @return {string}
+ */
+var reverseStr = function(s, k) {
+    let array = s.split('')
+    let array = [...s];
+    for(let i = 0; i < array.length;i = i+2*k){
+        let l = i ; let r = i + k -1 > array.length-1 ?array.length-1:i+k-1
+        while(l < r){
+            [array[l],array[r]] = [array[r],array[l]];
+            l++;
+            r--;
+        }
+    }
+    s = array.join('');
+    return s;
+};
+```
+
+> [!NOTE]
+> 可以直接交换字符串中的字符位置吗
+> 注意双指针中右指针的边界
+
+#### 翻转字符串中的单词
+
+```js
+/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseWords = function (s) {
+    s = s.trim();
+
+    let array = s.split(" ")
+    let result = " ";
+    for (let i = array.length - 1; i >= 0; i--) {
+        //去除空格为什么是'' 而不是' '？
+        if (array[i] === '') {
+            continue;
+        }
+        result += array[i] + " ";
+    }
+    result = result.trim();
+    return result;
+};
+```
+
+> [!NOTE]
+> 为何是array[i] === ''，而不是array[i] === ' '？
+
+#### 重复的子字符串
+
+```js
+/**
+ * @param {string} s
+ * @return {boolean}
+ */
+var repeatedSubstringPattern = function (s) {
+    let str = "";
+    let array = [...s];
+    for (let i = 0; i < array.length; i++) {
+        str += array[i];
+        let number = Math.floor(array.length / str.length);
+        if (s === str.repeat(number) && number!=1) {
+            console.log(str,number)
+            return true;
+        }
+    }
+    return false;
+};
+```
+
+> [!NOTE]
+> Math.floor()和str.repeat() 用法
