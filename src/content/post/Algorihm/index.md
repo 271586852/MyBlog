@@ -544,7 +544,6 @@ var threeSum = function (nums) {
         while (left < right) {
             if (nums[left] + nums[right] === targetNumber) {
                 let item = [nums[i], nums[left], nums[right]]
-                //console.log(result.includes(item));
                 if (result.includes(item)) {
                     continue;
                 }
@@ -554,7 +553,6 @@ var threeSum = function (nums) {
 
                 right--;
                 map.set(nums[left], left);
-                //console.log(result);
             }
             else if (nums[left] + nums[right] < targetNumber) {
                 left++;
@@ -587,16 +585,16 @@ var fourSum = function (nums, target) {
     nums.sort((a,b)=>a-b);
     console.log(nums);
     for (let i = 0; i < nums.length - 3; i++){
+
+        // ！！!优化！！！
         // 去重 i
         if (i > 0 && nums[i] === nums[i - 1]) continue;
-
         // 最小 4 数和 > target，后面更大，直接退出
         if (nums[i] + nums[i + 1] + nums[i + 2] + nums[i + 3] > target) break;
         // 最大 4 数和 < target，当前 i 太小，进入下一轮
         if (nums[i] + nums[nums.length - 3] + nums[nums.length - 2] + nums[nums.length - 1] < target) continue;
-        //if(nums[i] === nums[i+1]) continue;
+
         for (let j = i+1; j < nums.length - 2; j++) {
-            //if(nums[j] === nums[j+1]) continue;
             let left = j + 1;
             let right = nums.length - 1;
             let targetNumber = target - (nums[i] + nums[j]);
@@ -623,6 +621,9 @@ var fourSum = function (nums, target) {
     return result;
 };
 ```
+
+> [!NOTE]
+> 如何优化算法运行更快？
 
 
 ### 字符串
@@ -728,3 +729,115 @@ var repeatedSubstringPattern = function (s) {
 
 > [!NOTE]
 > Math.floor()和str.repeat() 用法
+
+### 栈与队列
+
+#### 用栈实现队列
+
+#### 用队列实现栈
+
+#### 有效的括号
+
+#### 删除字符串中的所有相邻重复项
+
+```js
+/**
+ * @param {string} s
+ * @return {string}
+ */
+var removeDuplicates = function(s) {
+    let inStk = [];
+    for(const ch of s){
+        if(ch === inStk[inStk.length-1]){
+            inStk.pop();
+            continue
+        }
+        else if(ch !== inStk[inStk.length-1]){
+            inStk.push(ch);
+        }
+    }
+    let out = "";
+    for(const ch of inStk){
+        out += ch;
+    }
+    return out;
+};
+```
+
+> [!NOTE]
+> Math.floor()和str.repeat() 用法
+
+#### 逆波兰表达式求值
+
+```js
+/**
+ * @param {string[]} tokens
+ * @return {number}
+ */
+var evalRPN = function(tokens) {
+    const stack = [];
+    for(const token of tokens){
+      if(isNaN(Number(token))){
+        const n2 = stack.pop();
+        const n1 = stack.pop();
+        switch(token){
+          case "+":
+            stack.push(n1+n2);
+            break;
+          case "-":
+            stack.push(n1-n2);
+            break;
+          case "*":
+            stack.push(n1*n2);
+            break;
+          case "/":
+            stack.push(n1/n2 | 0);
+            break;
+        }
+      }
+      else {
+        stack.push(Number(token));
+      }
+    }
+    return stack[0];
+};
+```
+
+> [!NOTE]
+> 为什么除法是 (n1/n2 | 0) ？ 符号`| 0 `的意义是什么
+
+#### 前K个高频元素
+
+```js
+/**
+ * @param {number[]} nums
+ * @param {number} k
+ * @return {number[]}
+ */
+var topKFrequent = function (nums, k) {
+  const map = new Map();
+  const res = [];
+  //使用 map 统计元素出现频率
+  for (const num of nums) {
+    map.set(num, (map.get(num) || 0) + 1);
+  }
+
+  let array = [];
+
+  for (const entry of map) {
+
+    array.push(entry);
+
+    if (array.length > k) {
+      array.sort((a, b) =>   b[1] - a[1]);
+      array.pop();   
+    }
+  }
+  console.log(array);
+  return array.map(item => item[0]); // 只取数字
+};
+```
+
+> [!NOTE]
+> 如何构建前K个高频数的数组
+
