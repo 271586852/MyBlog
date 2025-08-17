@@ -841,3 +841,41 @@ var topKFrequent = function (nums, k) {
 > [!NOTE]
 > 如何构建前K个高频数的数组
 
+
+
+### 二叉树
+
+#### 二叉树对称
+
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {boolean}
+ */
+var isSymmetric = function (root) {
+
+    const check = function(left, right) {
+        
+        if(left === null && right !== null)   return false;
+        if(left !== null && right === null)   return false;
+        if (left === null && right === null)    return true
+        if(left.val !== right.val) return false;
+        
+        
+        return check(left.right,right.left) && check(left.left,right.right);
+    }
+
+    return check(root.left,root.right);
+};
+```
+
+> [!NOTE]
+> 代码运行思路
