@@ -841,9 +841,47 @@ var topKFrequent = function (nums, k) {
 > [!NOTE]
 > 如何构建前K个高频数的数组
 
-
-
 ### 二叉树
+
+#### 翻转二叉树
+
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {TreeNode}
+ */
+var invertTree = function (root) {
+    const invert = function (root, result) {
+        if (root === null) {
+            return;
+        }
+        if (root.left) {
+            invert(root.left);
+        }
+        if (root.right) {
+            invert(root.right);
+        }
+
+        let temp = root.right;
+        root.right = root.left;
+        root.left = temp;
+
+    }
+    invert(root);
+    return root;
+};
+```
+
+> [!NOTE]
+> 翻转顺序
 
 #### 二叉树对称
 
@@ -879,3 +917,42 @@ var isSymmetric = function (root) {
 
 > [!NOTE]
 > 代码运行思路
+
+#### 二叉树的最大深度
+
+```js
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number}
+ */
+var maxDepth = function (root) {
+    let maxDepth = 0;
+    const depth = function (root, treedepth)
+    {
+        if (root === null) {
+            return treedepth;
+        }
+        let leftDeepth = depth(root.left,treedepth+1);
+        let rightDepth = depth(root.right,treedepth+1);
+        maxDepth = Math.max(leftDeepth,rightDepth)
+        return maxDepth;
+    }
+    if(root === null){
+        return 0;
+    }
+    let result = depth(root,0);
+    return result;
+};
+```
+
+> [!NOTE]
+> 为何是后序遍历？
+
