@@ -42,7 +42,7 @@ const primaryColor = post.data.coverImage?.color ?? 'hsl(var(--primary) / var(--
       {!!headings.length && <TOC headings={headings} />}
       <article
         class='flex-grow break-words'
-        style='flex-grow: 3; flex-shrink: 1; flex-basis: 60%;'
+        style='flex-grow: 1; flex-shrink: 1; flex-basis: auto; max-width: 100%;'
         data-pagefind-body
       >
         <div id='blog-hero'><BlogHero content={post} /></div>
@@ -69,6 +69,11 @@ const primaryColor = post.data.coverImage?.color ?? 'hsl(var(--primary) / var(--
 </PageLayout>
 
 <style define:vars={{ primaryColor }}>
+  /* 移除 prose 的最大宽度限制，让文章内容更宽 */
+  #content :global(.prose) {
+    max-width: 100% !important;
+  }
+  
   :global(.highlight) {
     color: var(--primaryColor) !important;
   }
@@ -90,7 +95,7 @@ const primaryColor = post.data.coverImage?.color ?? 'hsl(var(--primary) / var(--
   }
   #content :global(blockquote::after) {
     position: absolute;
-    content: '”';
+    content: '"';
     top: -5.4rem;
     right: -1.4rem;
     font-size: 10rem;

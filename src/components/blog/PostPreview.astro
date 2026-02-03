@@ -24,134 +24,70 @@ const postDate = data.updatedDate ?? data.publishDate
 const { remarkPluginFrontmatter } = await render()
 ---
 
-<li
-  class={cn(
-    'group/card flex flex-col relative rounded-2xl border border-border bg-background transition-colors ease-in-out px-5 py-3 hover:bg-primary-foreground',
-    detailed && 'max-sm:px-4 sm:py-5',
-    className
-  )}
->
-  <a
-    class={cn(
-      'group/link w-full flex flex-col transition-all hover:text-primary',
-      !detailed && 'sm:flex-row',
-      detailed && data.coverImage && 'max-md:pt-24'
-    )}
-    href={`/blog/${slug}`}
-    data-astro-prefetch
-  >
-    {
-      detailed && data.coverImage && (
-        <Image
-          src={data.coverImage.src}
-          inferSize
-          alt={data.coverImage.alt || data.title}
-          class='cover-image absolute end-0 top-0 z-0 h-2/3 w-full rounded-2xl object-cover opacity-40 transition-opacity duration-300 group-hover/card:opacity-70 md:h-full md:w-3/5'
-          loading='eager'
-        />
-      )
-    }
-
-    <FormattedDate class='min-w-[95px] py-1 text-xs' date={postDate} />
-
-    <Tag class='z-10 flex-grow'>
-      <!-- title -->
-      <div class='flex justify-between'>
-        <div>
-          {data.draft && <span class='text-red-500'>(Draft) </span>}
+<li class={cn('list-none', className)}>
+  <article class="interactive-card" data-tilt>
+    <div class="post-meta">
+      <span style="font-family: var(--font-mono); text-transform: uppercase;">
+        {data.draft ? 'DRAFT' : 'POST'}
+      </span>
+      <FormattedDate 
+        date={postDate} 
+        class="text-xs"
+        style="font-family: var(--font-mono);"
+      />
+    </div>
+    <div class="card-inner">
+      <a
+        href={`/blog/${slug}`}
+        data-astro-prefetch
+        style="text-decoration: none; color: inherit; display: block;"
+      >
+        <h2 style="color: var(--text-main); margin-bottom: 10px; font-size: 1.25rem; font-weight: 600;">
+          {data.draft && <span style="color: #ff4444;">(Draft) </span>}
           {data.title}
-        </div>
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='16'
-          height='16'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke-width='2.5'
-          stroke-linecap='round'
-          stroke-linejoin='round'
-          class='my-1 stroke-muted-foreground group-hover/link:stroke-primary'
-          ><line
-            x1='5'
-            y1='12'
-            x2='19'
-            y2='12'
-            class='translate-x-4 scale-x-0 transition-all duration-300 ease-in-out group-hover/link:translate-x-1 group-hover/link:scale-x-100'
-          ></line><polyline
-            points='12 5 19 12 12 19'
-            class='translate-x-0 transition-all duration-300 ease-in-out group-hover/link:translate-x-1'
-          ></polyline></svg
-        >
-      </div>
-      {
-        detailed && (
-          <>
-            {/* desc */}
-            <p
-              class={cn(
-                'line-clamp-2 pt-1 text-sm text-muted-foreground sm:line-clamp-3',
-                data.coverImage && 'sm:me-24'
-              )}
-            >
-              {data.description}
-            </p>
-            <div class='flex items-center gap-2 py-1.5 text-sm italic leading-4 text-muted-foreground sm:py-3'>
-              {/* reading time */}
-              <span class='flex items-center gap-1'>
-                <svg class='size-4'>
-                  <use href='/icons/ui.svg#mingcute-time-line' />
-                </svg>
-                {remarkPluginFrontmatter.minutesRead}
-              </span>
-              {/* language */}
-              {data.language && (
-                <span class='flex items-center gap-1'>
-                  <svg class='size-4'>
-                    <use href='/icons/project.svg#mingcute-earth-2-line' />
+        </h2>
+        {
+          detailed && (
+            <>
+              <p style="color: var(--text-dim); font-size: 14px; line-height: 1.6; margin-bottom: 15px;">
+                {data.description}
+              </p>
+              <div style="display: flex; align-items: center; gap: 15px; font-size: 12px; color: var(--text-dim); font-family: var(--font-mono);">
+                <span style="display: flex; align-items: center; gap: 5px;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
                   </svg>
-                  {data.language}
+                  {remarkPluginFrontmatter.minutesRead} min
                 </span>
-              )}
-            </div>
-          </>
+                {data.language && (
+                  <span style="display: flex; align-items: center; gap: 5px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="2" y1="12" x2="22" y2="12"></line>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    {data.language}
+                  </span>
+                )}
+              </div>
+            </>
+          )
+        }
+      </a>
+      <!-- tags -->
+      {
+        detailed && data.tags && (
+          <ul style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+            {data.tags.map((tag: string) => (
+              <li>
+                <Button title={tag} href={`/tags/${tag}`} style='pill' />
+              </li>
+            ))}
+          </ul>
         )
       }
-    </Tag>
-  </a>
-  <!-- tags -->
-  {
-    detailed && data.tags && (
-      <ul class='text-bgColor mt-1 flex flex-wrap gap-2'>
-        {data.tags.map((tag: string) => (
-          <li>
-            <Button title={tag} href={`/tags/${tag}`} style='pill' />
-          </li>
-        ))}
-      </ul>
-    )
-  }
+    </div>
+  </article>
 </li>
 
-<style>
-  .cover-image {
-    mask-image: linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-    -ms-mask-image: -ms-linear-gradient(to right, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-    -webkit-mask-image: -webkit-linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0) 0%,
-      rgba(0, 0, 0, 1) 100%
-    );
-  }
-
-  @media (max-width: 768px) {
-    .cover-image {
-      mask-image: linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-      -ms-mask-image: -ms-linear-gradient(to top, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 100%);
-      -webkit-mask-image: -webkit-linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0) 0%,
-        rgba(0, 0, 0, 1) 100%
-      );
-    }
-  }
-</style>
