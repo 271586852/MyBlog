@@ -17,29 +17,16 @@
 }
 
 @layer base {
+  /* --- Endfield UI 核心变量（仅暗黑模式） --- */
   :root {
-    --background: 210 33% 99%;
-    --foreground: 240 10% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-    --primary: 200 29% 45%;
-    --primary-foreground: 0 0% 96%;
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 28.1%;
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-    --destructive: 0 72.22% 50.59%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 240 5.9% 10%;
-    --radius: 0.5rem;
-  }
-  .dark {
+    --bg-base: #0a0a0b;
+    --bg-panel: #141416;
+    --text-main: #e0e0e0;
+    --text-dim: #6d7075;
+    --accent: #FFD324;
+    --font-mono: 'Courier New', Courier, monospace;
+    
+    /* Tailwind 兼容变量（暗黑模式值） */
     --background: 240 20.54% 5.2%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -52,22 +39,33 @@
     --secondary-foreground: 0 0% 98%;
     --muted: 240 3.7% 15.9%;
     --muted-foreground: 240 5% 74.9%;
-    --accent: 240 3.7% 15.9%;
+    --accent-color: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    box-sizing: border-box;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: var(--bg-base);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    min-height: 100vh;
   }
   a {
     @apply transition-colors hover:text-primary;
@@ -127,4 +125,219 @@ span.katex-display {
 #wl-edit {
   padding: 0.5rem;
   width: calc(100% - 2em);
+}
+
+/* --- Endfield UI 样式 --- */
+
+/* HUD 覆盖层 */
+.hud-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 999;
+  padding: 20px;
+  will-change: transform;
+  transition: transform 0.1s ease-out;
+}
+
+.hud-corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-dim);
+  opacity: 0.5;
+}
+
+.hud-corner.tl {
+  top: 20px;
+  left: 20px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.hud-corner.tr {
+  top: 20px;
+  right: 20px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.hud-corner.bl {
+  bottom: 20px;
+  left: 20px;
+  border-right: none;
+  border-top: none;
+}
+
+.hud-corner.br {
+  bottom: 20px;
+  right: 20px;
+  border-left: none;
+  border-top: none;
+}
+
+.scan-line {
+  position: absolute;
+  bottom: 100px;
+  right: 40px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  transform: rotate(-90deg);
+  transform-origin: right bottom;
+  letter-spacing: 2px;
+}
+
+/* 鼠标跟随光标 */
+.cursor-tracker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px dashed var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1000;
+  transform: translate(-50%, -50%);
+  transition: width 0.2s, height 0.2s, opacity 0.2s;
+  opacity: 0.5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-tracker::after {
+  content: "";
+  width: 4px;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+/* 布局容器 */
+.endfield-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 80px 20px;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 40px;
+}
+
+/* 交互式卡片 */
+.interactive-card {
+  background: var(--bg-panel);
+  margin-bottom: 30px;
+  position: relative;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transform: perspective(1000px) rotateX(0) rotateY(0) scale(1);
+  transition: transform 0.1s ease-out, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.card-inner {
+  padding: 30px;
+  border-left: 4px solid transparent;
+  transition: border-color 0.3s;
+  transform: translateZ(0);
+}
+
+.profile-card {
+  padding: 20px;
+  border-left: 4px solid var(--accent);
+}
+
+.interactive-card:hover {
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  z-index: 10;
+}
+
+.interactive-card:hover .card-inner {
+  border-left-color: var(--accent);
+}
+
+/* 文章元数据 */
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.header-title {
+  font-family: 'Oswald', sans-serif;
+  font-size: 4rem;
+  line-height: 0.9;
+  margin-bottom: 40px;
+  letter-spacing: -2px;
+}
+
+.header-title span {
+  color: var(--accent);
+  font-size: 1rem;
+  display: block;
+  letter-spacing: 5px;
+  font-family: var(--font-mono);
+}
+
+/* 侧边栏 */
+.endfield-sidebar {
+  padding-right: 20px;
+  border-right: 1px solid #333;
+}
+
+.nav-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-menu a {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  border: 1px solid transparent;
+  transition: 0.3s;
+}
+
+.nav-menu a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(255, 211, 36, 0.05);
+  padding-left: 20px;
+}
+
+/* 博客文章内容区域宽度优化 */
+.content article .prose {
+  max-width: 100% !important;
+}
+
+.content article {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  .endfield-container {
+    grid-template-columns: 1fr;
+  }
+  .endfield-sidebar {
+    border-right: none;
+    border-bottom: 1px solid #333;
+    padding-bottom: 20px;
+  }
+  .cursor-tracker {
+    display: none;
+  }
 }

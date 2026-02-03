@@ -23,7 +23,7 @@ const {
 } = Astro.props
 ---
 
-<html lang={siteConfig.lang}>
+<html lang={siteConfig.lang} class="dark">
   <head>
     <BaseHead articleDate={articleDate} description={description} ogImage={ogImage} title={title} />
   </head>
@@ -38,12 +38,103 @@ const {
       )
     }
     <ThemeProvider />
-    <main
-      class='z-10 flex min-h-screen w-screen max-w-[60rem] flex-col items-center px-4 pb-10 text-[0.92rem] leading-relaxed sm:px-7 lg:px-10'
-    >
-      <Header />
-      <slot />
-      <Footer />
+    
+    <!-- HUD 覆盖层 -->
+    <div class="hud-overlay" id="hudLayer">
+      <div class="hud-corner tl"></div>
+      <div class="hud-corner tr"></div>
+      <div class="hud-corner bl"></div>
+      <div class="hud-corner br"></div>
+      <div class="scan-line">STABLE_MODE // TARGETING_ACTIVE</div>
+    </div>
+
+    <!-- 光标跟踪器 -->
+    <div class="cursor-tracker" id="cursorTracker"></div>
+
+    <main class='z-10 min-h-screen w-full text-[0.92rem] leading-relaxed'>
+      <div class="endfield-container">
+        <aside class="endfield-sidebar">
+          <Header />
+        </aside>
+        <div class="content">
+          <slot />
+          <Footer />
+        </div>
+      </div>
     </main>
+
+    <!-- Endfield UI 交互脚本 -->
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const hud = document.getElementById('hudLayer');
+        const cursor = document.getElementById('cursorTracker');
+        
+        if (!hud || !cursor) return;
+        
+        // --- 1. 全局微动 (只给 HUD 和 光标) ---
+        document.addEventListener('mousemove', (e) => {
+          const x = e.clientX;
+          const y = e.clientY;
+          
+          // 光标跟随
+          cursor.style.left = x + 'px';
+          cursor.style.top = y + 'px';
+
+          // HUD 极微小的视差 (系数很小，除以 100)
+          const hudX = (window.innerWidth / 2 - x) / 100;
+          const hudY = (window.innerHeight / 2 - y) / 100;
+          hud.style.transform = `translate(${hudX}px, ${hudY}px)`;
+        });
+
+        // --- 2. 局部 3D 倾斜 (只针对卡片) ---
+        const cards = document.querySelectorAll('.interactive-card');
+
+        cards.forEach(card => {
+          card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            // 计算鼠标在卡片内部的坐标
+            const x = e.clientX - rect.left; 
+            const y = e.clientY - rect.top; 
+            
+            // 计算中心点
+            const justifyX = x - rect.width / 2;
+            const justifyY = y - rect.height / 2;
+
+            // 计算旋转角度 (敏感度系数，越大约不敏感)
+            const rotateY = justifyX / 30; 
+            const rotateX = -justifyY / 30; // X轴旋转需要取反
+
+            card.style.transform = `
+              perspective(1000px) 
+              rotateX(${rotateX}deg) 
+              rotateY(${rotateY}deg) 
+              scale(1.02)
+            `;
+          });
+
+          // 鼠标移出时复位
+          card.addEventListener('mouseleave', () => {
+            card.style.transform = `
+              perspective(1000px) 
+              rotateX(0) 
+              rotateY(0) 
+              scale(1)
+            `;
+          });
+          
+          // 光标互动状态
+          card.addEventListener('mouseenter', () => {
+            cursor.style.width = '60px';
+            cursor.style.height = '60px';
+            cursor.style.borderColor = '#fff';
+          });
+          card.addEventListener('mouseleave', () => {
+            cursor.style.width = '40px';
+            cursor.style.height = '40px';
+            cursor.style.borderColor = '#FFD324';
+          });
+        });
+      });
+    </script>
   </body>
 </html>
