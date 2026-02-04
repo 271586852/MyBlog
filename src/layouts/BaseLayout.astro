@@ -90,8 +90,11 @@ const {
         const cards = document.querySelectorAll('.interactive-card');
 
         cards.forEach(card => {
-          card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
+          // 类型断言为 HTMLElement 以访问 style 属性
+          const htmlCard = card as HTMLElement;
+          
+          htmlCard.addEventListener('mousemove', (e) => {
+            const rect = htmlCard.getBoundingClientRect();
             // 计算鼠标在卡片内部的坐标
             const x = e.clientX - rect.left; 
             const y = e.clientY - rect.top; 
@@ -104,7 +107,7 @@ const {
             const rotateY = justifyX / 30; 
             const rotateX = -justifyY / 30; // X轴旋转需要取反
 
-            card.style.transform = `
+            htmlCard.style.transform = `
               perspective(1000px) 
               rotateX(${rotateX}deg) 
               rotateY(${rotateY}deg) 
@@ -113,8 +116,8 @@ const {
           });
 
           // 鼠标移出时复位
-          card.addEventListener('mouseleave', () => {
-            card.style.transform = `
+          htmlCard.addEventListener('mouseleave', () => {
+            htmlCard.style.transform = `
               perspective(1000px) 
               rotateX(0) 
               rotateY(0) 
@@ -123,15 +126,19 @@ const {
           });
           
           // 光标互动状态
-          card.addEventListener('mouseenter', () => {
-            cursor.style.width = '60px';
-            cursor.style.height = '60px';
-            cursor.style.borderColor = '#fff';
+          htmlCard.addEventListener('mouseenter', () => {
+            if (cursor) {
+              cursor.style.width = '60px';
+              cursor.style.height = '60px';
+              cursor.style.borderColor = '#fff';
+            }
           });
-          card.addEventListener('mouseleave', () => {
-            cursor.style.width = '40px';
-            cursor.style.height = '40px';
-            cursor.style.borderColor = '#FFD324';
+          htmlCard.addEventListener('mouseleave', () => {
+            if (cursor) {
+              cursor.style.width = '40px';
+              cursor.style.height = '40px';
+              cursor.style.borderColor = '#FFD324';
+            }
           });
         });
       });
